@@ -45,26 +45,5 @@ namespace ReflectorServer
 
         }
 
-        public static object[] PopulateArguments2(MethodInfo targetMethod, JsonElement[] elements)
-        {
-
-            var populated = targetMethod.GetParameters().Select((par, i) =>
-                JsonElementToObject(elements[i], par.ParameterType)).ToArray();
-            return populated;
-
-        }
-        public static object JsonElementToObject(JsonElement el, Type targetType)
-        {
-            object res = targetType switch
-            {
-                _ when targetType == typeof(string) => el.GetString(),
-                _ when targetType == typeof(Int32) => el.GetInt32(),
-                
-                _ => null // xxx no arrays etc yet
-            };
-            return res;
-
-        }
-
     }
 }
