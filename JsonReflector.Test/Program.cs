@@ -7,7 +7,7 @@ namespace JsonReflector.Test
 {
     public class PageObject
     {
-        public string TargetMethod(int a, string b, int[] c)
+        public string TargetMethod(int a, string b, List<string> lstring, int[] c)
         {
             return "ok";
         }
@@ -18,18 +18,21 @@ namespace JsonReflector.Test
         
         static void Main(string[] args)
         {
-            var s = @" {
-                'Args': [1,'12', [1,1]]
-                }".Replace('\'', '"');
-          
-            
-            var o = JsonSerializer.Deserialize<InvokeDto>(s);
             var m = Dispatcher.ResolveMethod("JsonReflector.Test.PageObject,JsonReflector.Test", "TargetMethod");
 
-            var createdArgs = Dispatcher.PopulateArguments(m, o.Args);
+
+
+            var s2 = System.Text.Encoding.UTF8.GetBytes(@" ['hello', 1, '12', ['nested'], [2,3]".Replace('\'', '"'));
+            var rd = new Utf8JsonReader(s2);
+            rd.Read(); // startarray
+            rd.Read(); // function
+            var func = rd.GetString();
+            var createdArgs = Dispatcher.PopulateArguments(m, ref rd);
             var instance = new PageObject();
             m.Invoke(instance, createdArgs);
-            Console.WriteLine("Hello World!");
+
+
+
         }
     }
 }

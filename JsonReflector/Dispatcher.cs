@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
@@ -30,8 +31,21 @@ namespace ReflectorServer
             return Task.CompletedTask;
 
         }
+        public static object[] PopulateArguments(MethodInfo targetMethod, ref Utf8JsonReader rd)
+        {
 
-        public static object[] PopulateArguments(MethodInfo targetMethod, JsonElement[] elements)
+            var objects = new List<object>();
+            foreach (var par in targetMethod.GetParameters())
+            {
+                rd.Read();
+                var extracted = JsonSerializer.Deserialize(ref rd, par.ParameterType);
+                objects.Add(extracted);
+            }
+            return objects.ToArray();
+
+        }
+
+        public static object[] PopulateArguments2(MethodInfo targetMethod, JsonElement[] elements)
         {
 
             var populated = targetMethod.GetParameters().Select((par, i) =>
