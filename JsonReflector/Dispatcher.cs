@@ -15,14 +15,24 @@ namespace ReflectorServer
         public Type Type { get; set; }
         public object Instance { get; set; }
 
+        private string DescribeType(Type t)
+        {
+            if (!t.IsGenericType)
+            {
+                return t.Name;
+            }
+            return t.Name + " " + String.Join(' ', t.GetGenericArguments().Select(a => DescribeType(a)));
+        }
+
         public List<object> Describe()
         {
             List<object> all = new();
             all.Add(Name);
             all.Add(Type.FullName);
+
             foreach (var method in Type.GetMethods())
             {
-                var paramss = method.GetParameters().Select(p => $"{p.Name} {p.ParameterType.Name}");
+                var paramss = method.GetParameters().Select(p => $"{p.Name} {DescribeType(p.ParameterType)}");
                 all.Add(new object[] { method.Name, paramss });
 
             }
