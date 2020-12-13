@@ -25,6 +25,10 @@ namespace JsonReflector.Test
             public ICollection<string> Whoa { get; set; }
         }
 
+        public bool Ping()
+        {
+            return true;
+        }
         public DemoNestedType TargetMethod(int a, string b, List<string> lstring, int[] c, DemoNestedType complex)
         {
             if (a == 1)
