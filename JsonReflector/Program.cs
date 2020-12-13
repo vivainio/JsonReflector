@@ -4,11 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace ReflectorServer
 {
+    public class AppIntegration : IDispatcherIntegration
+    {
+        public Session CreateSession()
+        {
+            // no services to add just now
+            return new Session();
+        }
+    }
     public class Program
     {
         public static void Main(string[] args)
@@ -21,6 +30,11 @@ namespace ReflectorServer
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureServices(sc =>
+                {
+                    sc.AddSingleton<IDispatcherIntegration, AppIntegration>();
                 });
+            
     }
 }

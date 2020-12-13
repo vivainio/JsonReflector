@@ -14,7 +14,6 @@ namespace ReflectorServer
         {
            
             var dispatcher = new Dispatcher();
-            //dispatcher.AddInstance()
             dispatcher.RegisterTypes(new[] { typeof(DemoDispatchClass) });
             services.AddSingleton(dispatcher);
         }
@@ -22,13 +21,17 @@ namespace ReflectorServer
 
         Session ResolveSession(HttpContext ctx)
         {
-            var dispatcher = ctx.RequestServices.GetService<Dispatcher>();
+            var integration = ctx.RequestServices.GetRequiredService<IDispatcherIntegration>();
+
             var found = ctx.Request.Headers.TryGetValue("x-remote-session-id", out var sessionId);
+
             if (!found)
             {
                 // clean session on every request
-                return new Session();
+                return integration.CreateSession();
             }
+
+            var dispatcher = ctx.RequestServices.GetService<Dispatcher>();
 
             var stored = dispatcher.Sessions.TryGetValue(sessionId, out var foundSession);
 
@@ -37,7 +40,7 @@ namespace ReflectorServer
                 return foundSession;
             }
 
-            var blankSession = new Session();
+            var blankSession = integration.CreateSession();
             dispatcher.Sessions.Add(sessionId, blankSession);
 
             return blankSession;

@@ -12,8 +12,9 @@ def describe():
 
 def run_raw(c: bytes, session_id: str) -> bytes:
     req = request.Request(URL + "/run", data = c)
-    resp = request.urlopen(req)
     req.add_header("x-remote-session-id", session_id)
+
+    resp = request.urlopen(req)
     return resp.read()
 
 def run(c: list, session_id: str):

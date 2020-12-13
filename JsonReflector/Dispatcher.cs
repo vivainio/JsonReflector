@@ -42,6 +42,12 @@ namespace ReflectorServer
         }
     }
 
+    public interface IDispatcherIntegration
+    {
+        // this is the place to call setinstance & create initial services
+        Session CreateSession();
+    }
+
     public class Session
     {
         Dictionary<Type, object> Instances = new();
@@ -74,8 +80,8 @@ namespace ReflectorServer
     {
         public Dictionary<string, Session> Sessions = new();
         Dictionary<string, ClassEntry> TypeMap = new();
-        // more variants of AddInstance possibly needed, e.g. add with full
-        // namespace or own name - or only new up the instance later!
+        // more variants of RegisterTypes possibly needed, e.g. add with full
+        // namespace or own name
 
         public void RegisterTypes(IEnumerable<Type> types)
         {
@@ -94,7 +100,7 @@ namespace ReflectorServer
             var all = TypeMap.Values.Select(p => p.Describe()).ToArray();
             return JsonSerializer.SerializeToUtf8Bytes(all);
         }
-        public byte[] DispatchJson(ReadOnlySpan<byte> json, Session session = null)
+        public byte[] DispatchJson(ReadOnlySpan<byte> json, Session session)
         {
             var rd = new Utf8JsonReader(json);
             rd.Read(); // startarray
