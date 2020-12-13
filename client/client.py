@@ -10,18 +10,19 @@ def describe():
     return json.loads(resp.read())
 
 
-def run_raw(c: bytes) -> bytes:
+def run_raw(c: bytes, session_id: str) -> bytes:
     req = request.Request(URL + "/run", data = c)
     resp = request.urlopen(req)
+    req.add_header("x-remote-session-id", session_id)
     return resp.read()
 
-def run(c: list):
+def run(c: list, session_id: str):
     body = json.dumps(c).encode()
-    ret = run_raw(body)
+    ret = run_raw(body, session_id)
     return json.loads(ret)
 
 def test_run():
-    run(["DemoDispatchClass", "TargetMethod",  1, "12", ["nested"], [2,3], { "Whoa" : ["deep value 1", "deep2"]}])
+    run(["DemoDispatchClass", "TargetMethod",  1, "12", ["nested"], [2,3], { "Whoa" : ["deep value 1", "deep2"]}], "foo")
 
 def benchmark():
     t = timeit.timeit(test_run, number = 1000)

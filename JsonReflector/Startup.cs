@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Threading.Tasks;
 using JsonReflector;
 namespace ReflectorServer
 {
@@ -21,7 +20,29 @@ namespace ReflectorServer
         }
 
 
+        Session ResolveSession(HttpContext ctx)
+        {
+            var dispatcher = ctx.RequestServices.GetService<Dispatcher>();
+            var found = ctx.Request.Headers.TryGetValue("x-remote-session-id", out var sessionId);
+            if (!found)
+            {
+                // clean session on every request
+                return new Session();
+            }
 
+            var stored = dispatcher.Sessions.TryGetValue(sessionId, out var foundSession);
+
+            if (stored)
+            {
+                return foundSession;
+            }
+
+            var blankSession = new Session();
+            dispatcher.Sessions.Add(sessionId, blankSession);
+
+            return blankSession;
+
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -39,7 +60,8 @@ namespace ReflectorServer
 
                     var d = context.RequestServices.GetRequiredService<Dispatcher>();
                     var cont = await context.Request.Body.GetRawBytesAsync();
-                    var ret = d.DispatchJson(cont);
+                    var ses = ResolveSession(context);
+                    var ret = d.DispatchJson(cont, ses);
                     await context.Response.WriteAsync(ret.AsString());
                 });
 

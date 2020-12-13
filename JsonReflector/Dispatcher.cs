@@ -72,7 +72,7 @@ namespace ReflectorServer
     }
     public class Dispatcher
     {
-        Dictionary<string, Session> Sessions = new();
+        public Dictionary<string, Session> Sessions = new();
         Dictionary<string, ClassEntry> TypeMap = new();
         // more variants of AddInstance possibly needed, e.g. add with full
         // namespace or own name - or only new up the instance later!
