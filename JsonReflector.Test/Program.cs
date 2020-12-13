@@ -6,13 +6,20 @@ namespace JsonReflector.Test
     class Program
     {
         
+        public static void TestSession()
+        {
+            var s = new Session();
+            var got = s.GetInstance(typeof(DemoDispatchClass));
+
+
+        }
         static void Main(string[] args)
         {
+            TestSession();
             byte[] json(string s) => s.Replace('\'', '"').AsUtf();
 
             var disp = new Dispatcher();
-            var instance = new DemoDispatchClass();
-            disp.AddInstance(instance);
+            disp.RegisterTypes(new[] { typeof(DemoDispatchClass) });
 
             var okCall = json(@" ['DemoDispatchClass', 'TargetMethod',  1, '12', ['nested'], [2,3], { 'Whoa' : ['deep value 1', 'deep2'] } ");
 

@@ -3,8 +3,21 @@ using System.Collections.Generic;
 
 namespace JsonReflector.Test
 {
+    public class DemoClassDependency
+    {
+        public DemoClassDependency()
+        {
+
+        }
+    }
     public class DemoDispatchClass
     {
+        private DemoClassDependency myDep;
+
+        public DemoDispatchClass(DemoClassDependency dep)
+        {
+            this.myDep = dep;
+        }
         public class DemoNestedType
         {
             public ICollection<string> Whoa { get; set; }

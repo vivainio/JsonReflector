@@ -15,10 +15,11 @@ namespace ReflectorServer
         {
            
             var dispatcher = new Dispatcher();
-            dispatcher.AddInstance(new DemoDispatchClass());
             //dispatcher.AddInstance()
+            dispatcher.RegisterTypes(new[] { typeof(DemoDispatchClass) });
             services.AddSingleton(dispatcher);
         }
+
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

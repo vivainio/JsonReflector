@@ -13,7 +13,7 @@ namespace ReflectorServer
     {
         public string Name { get; set; }
         public Type Type { get; set; }
-        public object Instance { get; set; }
+        // public object Instance { get; set; }
 
         private string DescribeType(Type t)
         {
@@ -41,46 +41,73 @@ namespace ReflectorServer
         }
     }
 
+    public class Session
+    {
+        Dictionary<Type, object> Instances = new();
+        public object GetInstance(Type T)
+        {
+
+            // already insteantiated
+            var t = T;
+            if (Instances.ContainsKey(t)) {
+                return Instances[t];
+            }
+
+            // minimal di - we support one constructor
+            var ctor = t.GetConstructors()[0];
+            var cparams = ctor.GetParameters().Select(param => GetInstance(param.ParameterType)).ToArray();
+            var invoked = ctor.Invoke(cparams);
+            Instances[t] = invoked;
+            return invoked;
+        }
+    
+
+    }
     public class Dispatcher
     {
-        Dictionary<string, ClassEntry> LookupTable = new();
-
+        Dictionary<string, Session> Sessions = new();
+        Dictionary<string, ClassEntry> TypeMap = new();
         // more variants of AddInstance possibly needed, e.g. add with full
         // namespace or own name - or only new up the instance later!
-        public void AddInstance<T>(T instance)
+
+        public void RegisterTypes(IEnumerable<Type> types)
         {
-            var t = typeof(T);
-            LookupTable.Add(t.Name, new ClassEntry {
-                Name = t.Name,
-                Instance = instance, 
-                Type = t,
-            });
+            foreach (var t in types)
+            {
+                TypeMap.Add(t.Name, new ClassEntry
+                {
+                    Name = t.Name,
+                    Type = t
+                });
+            }
         }
 
         public byte[] Describe()
         {
-            var all = LookupTable.Values.Select(p => p.Describe()).ToArray();
+            var all = TypeMap.Values.Select(p => p.Describe()).ToArray();
             return JsonSerializer.SerializeToUtf8Bytes(all);
         }
-        public byte[] DispatchJson(ReadOnlySpan<byte> json)
+        public byte[] DispatchJson(ReadOnlySpan<byte> json, Session session = null)
         {
             var rd = new Utf8JsonReader(json);
             rd.Read(); // startarray
 
-            rd.Read(); 
+            rd.Read();
             var className = rd.GetString();
             rd.Read();
             var methodName = rd.GetString();
 
-            var entry = LookupTable[className];
-            var methodInfo = entry.Type.GetMethod(methodName);
+            session ??= new Session();
+            var registration = TypeMap[className];
 
+            var instance = session.GetInstance(registration.Type);
+            var methodInfo = registration.Type.GetMethod(methodName);
             var args = PopulateArguments(methodInfo, ref rd);
 
             object retVal;
             try
             {
-                retVal = methodInfo.Invoke(entry.Instance, args);
+                retVal = methodInfo.Invoke(instance, args);
 
             } catch (Exception e)
             {
