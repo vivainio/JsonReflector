@@ -13,9 +13,6 @@ namespace ReflectorServer
         public void ConfigureServices(IServiceCollection services)
         {
            
-            var dispatcher = new Dispatcher();
-            dispatcher.RegisterTypes(new[] { typeof(DemoDispatchClass) });
-            services.AddSingleton(dispatcher);
         }
 
 

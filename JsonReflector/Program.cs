@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JsonReflector;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,9 @@ namespace ReflectorServer
                 .ConfigureServices(sc =>
                 {
                     sc.AddSingleton<IDispatcherIntegration, AppIntegration>();
+                    var dispatcher = new Dispatcher();
+                    dispatcher.RegisterTypes(new[] { typeof(DemoDispatchClass) });
+                    sc.AddSingleton(dispatcher);
                 });
             
     }
