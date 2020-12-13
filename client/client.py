@@ -1,7 +1,7 @@
 from urllib import request
 import json
-import pprint
 import timeit
+import pprint
 
 URL = "http://localhost:5000"
 
@@ -28,5 +28,6 @@ def benchmark():
     print("time ", t, "sec per 1000 reqs (expected ~ 2.4sec total, so 2.4ms per call")
 
 api = describe()
+pprint.pprint(api)
 benchmark()
 
