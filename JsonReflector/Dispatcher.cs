@@ -31,7 +31,7 @@ namespace ReflectorServer
             all.Add(Name);
             all.Add(Type.FullName);
 
-            foreach (var method in Type.GetMethods())
+            foreach (var method in Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 var paramss = method.GetParameters().Select(p => $"{p.Name} {DescribeType(p.ParameterType)}");
                 all.Add(new object[] { method.Name, paramss });
@@ -54,7 +54,7 @@ namespace ReflectorServer
         public object GetInstance(Type T)
         {
 
-            // already insteantiated
+            // already instantiated
             var t = T;
             if (Instances.ContainsKey(t)) {
                 return Instances[t];
@@ -98,23 +98,28 @@ namespace ReflectorServer
         public byte[] Describe()
         {
             var all = TypeMap.Values.Select(p => p.Describe()).ToArray();
-            return JsonSerializer.SerializeToUtf8Bytes(all);
+            return JsonSerializer.SerializeToUtf8Bytes(all, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
         }
-        public byte[] DispatchJson(ReadOnlySpan<byte> json, Session session)
+        public static (string className, string methodName) ReadHeader(ref Utf8JsonReader rd)
         {
-            var rd = new Utf8JsonReader(json);
             rd.Read(); // startarray
-
             rd.Read();
             var className = rd.GetString();
             rd.Read();
             var methodName = rd.GetString();
+            return (className, methodName);
 
-            session ??= new Session();
-            var registration = TypeMap[className];
-
+        }
+        public byte[] DispatchJson(ReadOnlySpan<byte> json, Session session)
+        {
+            var rd = new Utf8JsonReader(json);
+            var header = ReadHeader(ref rd);
+            var registration = TypeMap[header.className];
             var instance = session.GetInstance(registration.Type);
-            var methodInfo = registration.Type.GetMethod(methodName);
+            var methodInfo = registration.Type.GetMethod(header.methodName);
             var args = PopulateArguments(methodInfo, ref rd);
 
             object retVal;

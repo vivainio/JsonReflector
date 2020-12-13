@@ -12,6 +12,12 @@ namespace JsonReflector
 
         }
     }
+
+    public class DemoOtherClass
+    {
+        public string Ping() => "Pong";
+    }
+
     public class DemoDispatchClass
     {
         private DemoClassDependency myDep;

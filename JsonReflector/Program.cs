@@ -36,7 +36,10 @@ namespace ReflectorServer
                 {
                     sc.AddSingleton<IDispatcherIntegration, AppIntegration>();
                     var dispatcher = new Dispatcher();
-                    dispatcher.RegisterTypes(new[] { typeof(DemoDispatchClass) });
+                    dispatcher.RegisterTypes(new[] {
+                        typeof(DemoDispatchClass),
+                        typeof(DemoOtherClass)
+                    }); 
                     sc.AddSingleton(dispatcher);
                 });
             
