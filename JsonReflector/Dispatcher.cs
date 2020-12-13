@@ -5,18 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace ReflectorServer
 {
-    public class InvokeDto
-    {
-        public string Class { get; set; }
-        public string Method { get; set; }
-        public JsonElement[] Args { get; set; }
-
-    }
-
     // our lookup table has these
     public class ClassEntry
     {
@@ -29,18 +20,8 @@ namespace ReflectorServer
     {
         Dictionary<string, ClassEntry> LookupTable = new();
 
-        public static MethodInfo ResolveMethod(string klass, string name)
-        {
-            var t = Type.GetType(klass);
-            var meth = t.GetMethod(name);
-            return meth;
-        }
-        public static Task Run(HttpContext ctx) 
-        {
-            var text = ctx.Request.ReadFromJsonAsync<InvokeDto>();
-            return Task.CompletedTask;
-        }
-
+        // more variants of AddInstance possibly needed, e.g. add with full
+        // namespace or own name - or only new up the instance later!
         public void AddInstance<T>(T instance)
         {
             var t = typeof(T);
