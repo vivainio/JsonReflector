@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -60,6 +61,12 @@ namespace ReflectorServer
             Instances[t] = invoked;
             return invoked;
         }
+
+        public void SetInstance<T>(T instance)
+        {
+            Instances.Add(typeof(T), instance);
+        }
+
     
 
     }

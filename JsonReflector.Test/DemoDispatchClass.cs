@@ -5,8 +5,10 @@ namespace JsonReflector.Test
 {
     public class DemoClassDependency
     {
+        public static int CallCount = 0;
         public DemoClassDependency()
         {
+            CallCount++;
 
         }
     }
