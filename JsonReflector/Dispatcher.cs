@@ -14,6 +14,21 @@ namespace ReflectorServer
         public string Name { get; set; }
         public Type Type { get; set; }
         public object Instance { get; set; }
+
+        public List<object> Describe()
+        {
+            List<object> all = new();
+            all.Add(Name);
+            all.Add(Type.FullName);
+            foreach (var method in Type.GetMethods())
+            {
+                var paramss = method.GetParameters().Select(p => $"{p.Name} {p.ParameterType.Name}");
+                all.Add(new object[] { method.Name, paramss });
+
+            }
+            return all;
+
+        }
     }
 
     public class Dispatcher
@@ -32,6 +47,11 @@ namespace ReflectorServer
             });
         }
 
+        public byte[] Describe()
+        {
+            var all = LookupTable.Values.Select(p => p.Describe()).ToArray();
+            return JsonSerializer.SerializeToUtf8Bytes(all);
+        }
         public byte[] DispatchJson(ReadOnlySpan<byte> json)
         {
             var rd = new Utf8JsonReader(json);

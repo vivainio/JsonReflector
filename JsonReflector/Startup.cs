@@ -44,7 +44,10 @@ namespace ReflectorServer
 
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+
+                    var d = context.RequestServices.GetRequiredService<Dispatcher>();
+                    var ret = d.Describe();
+                    await context.Response.WriteAsync(ret.AsString());
                 });
             });
         }
