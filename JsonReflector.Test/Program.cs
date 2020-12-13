@@ -9,11 +9,25 @@ namespace JsonReflector.Test
     {
         public ICollection<string> Whoa { get; set; }
     }
+
+    public static class Utf8BytesExtensions
+    {
+        public static string AsString(this byte[] bytes) => System.Text.Encoding.UTF8.GetString(bytes);
+        public static byte[] AsUtf(this string s) => System.Text.Encoding.UTF8.GetBytes(s);
+
+    }
     public class PageObject
     {
-        public string TargetMethod(int a, string b, List<string> lstring, int[] c, NestedType complex)
+        public NestedType TargetMethod(int a, string b, List<string> lstring, int[] c, NestedType complex)
         {
-            return "ok";
+            if (a == 1)
+            {
+                return new NestedType
+                {
+                    Whoa = new[] { "legal response" }
+                };
+            }
+            throw new ArgumentException("This only allows a to be 1. For shame!");
         }
 
     }
@@ -24,17 +38,19 @@ namespace JsonReflector.Test
         {
             var m = Dispatcher.ResolveMethod("JsonReflector.Test.PageObject,JsonReflector.Test", "TargetMethod");
 
-            var s2 = System.Text.Encoding.UTF8.GetBytes(@" ['hello', 1, '12', ['nested'], [2,3], { 'Whoa' : ['deep value 1', 'deep2'] } ".Replace('\'', '"'));
-            var rd = new Utf8JsonReader(s2);
-            rd.Read(); // startarray
-            rd.Read(); // function
-            var func = rd.GetString();
-            var createdArgs = Dispatcher.PopulateArguments(m, ref rd);
+            byte[] json(string s) => s.Replace('\'', '"').AsUtf();
+
+            var disp = new Dispatcher();
             var instance = new PageObject();
-            m.Invoke(instance, createdArgs);
+            disp.AddInstance(instance);
 
+            var okCall = json(@" ['PageObject', 'TargetMethod',  1, '12', ['nested'], [2,3], { 'Whoa' : ['deep value 1', 'deep2'] } ");
 
+            var okRet = disp.DispatchJson(okCall).AsString();
 
+            // raises exception
+            var failCall = json(@" ['PageObject', 'TargetMethod',  2, '12', ['nested'], [2,3], { 'Whoa' : ['deep value 1', 'deep2'] } ");
+            var failRet = disp.DispatchJson(failCall).AsString();
         }
     }
 }

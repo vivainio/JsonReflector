@@ -17,8 +17,18 @@ namespace ReflectorServer
 
     }
 
+    // our lookup table has these
+    public class ClassEntry
+    {
+        public string Name { get; set; }
+        public Type Type { get; set; }
+        public object Instance { get; set; }
+    }
+
     public class Dispatcher
     {
+        Dictionary<string, ClassEntry> LookupTable = new();
+
         public static MethodInfo ResolveMethod(string klass, string name)
         {
             var t = Type.GetType(klass);
@@ -29,8 +39,50 @@ namespace ReflectorServer
         {
             var text = ctx.Request.ReadFromJsonAsync<InvokeDto>();
             return Task.CompletedTask;
-
         }
+
+        public void AddInstance<T>(T instance)
+        {
+            var t = typeof(T);
+            LookupTable.Add(t.Name, new ClassEntry {
+                Name = t.Name,
+                Instance = instance, 
+                Type = t,
+            });
+        }
+
+        public byte[] DispatchJson(ReadOnlySpan<byte> json)
+        {
+            var rd = new Utf8JsonReader(json);
+            rd.Read(); // startarray
+
+            rd.Read(); 
+            var className = rd.GetString();
+            rd.Read();
+            var methodName = rd.GetString();
+
+            var entry = LookupTable[className];
+            var methodInfo = entry.Type.GetMethod(methodName);
+
+            var args = PopulateArguments(methodInfo, ref rd);
+
+            object retVal;
+            try
+            {
+                retVal = methodInfo.Invoke(entry.Instance, args);
+
+            } catch (Exception e)
+            {
+                retVal = new
+                {
+                    Exception = e.InnerException.ToString()
+                };
+
+            }
+            return JsonSerializer.SerializeToUtf8Bytes(retVal);
+        }
+
+
         public static object[] PopulateArguments(MethodInfo targetMethod, ref Utf8JsonReader rd)
         {
 
