@@ -83,13 +83,14 @@ namespace ReflectorServer
         // more variants of RegisterTypes possibly needed, e.g. add with full
         // namespace or own name
 
-        public void RegisterTypes(IEnumerable<Type> types)
+        public void RegisterTypes(IEnumerable<Type> types, string prefix = "")
         {
             foreach (var t in types)
             {
-                TypeMap.Add(t.Name, new ClassEntry
+                var name = prefix + t.Name;
+                TypeMap.Add(name, new ClassEntry
                 {
-                    Name = t.Name,
+                    Name = name,
                     Type = t
                 });
             }

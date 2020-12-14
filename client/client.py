@@ -23,7 +23,7 @@ def run(c: list, session_id: str):
     return json.loads(ret)
 
 def test_run():
-    run(["DemoDispatchClass", "TargetMethod",  1, "12", ["nested"], [2,3], { "Whoa" : ["deep value 1", "deep2"]}], "foo")
+    run(["App.DemoDispatchClass", "TargetMethod",  1, "12", ["nested"], [2,3], { "Whoa" : ["deep value 1", "deep2"]}], "foo")
 
 def benchmark():
     t = timeit.timeit(test_run, number = 1000)

@@ -39,7 +39,7 @@ namespace ReflectorServer
                     dispatcher.RegisterTypes(new[] {
                         typeof(DemoDispatchClass),
                         typeof(DemoOtherClass)
-                    }); 
+                    }, prefix: "App."); 
                     sc.AddSingleton(dispatcher);
                 });
             
