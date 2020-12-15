@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
@@ -63,7 +64,7 @@ namespace JsonReflector
             all.Add(Name);
             all.Add(Type.FullName);
 
-            foreach (var method in Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            foreach (var method in Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Static))
             {
                 var paramss = method.GetParameters().Select(p => DescribeParameter(p) );
                 all.Add(new object[] { method.Name, paramss });
@@ -114,6 +115,13 @@ namespace JsonReflector
     
 
     }
+
+    public class ReturnValue
+    {
+        public object R { get; set; }
+        public string Exc { get; set; }
+        public string Out { get; set; }
+    }
     public class Dispatcher
     {
         public Dictionary<string, Session> Sessions = new();
@@ -157,23 +165,29 @@ namespace JsonReflector
             var rd = new Utf8JsonReader(json);
             var header = ReadHeader(ref rd);
             var registration = TypeMap[header.className];
-            var instance = session.GetInstance(registration.Type);
             var methodInfo = registration.Type.GetMethod(header.methodName);
             var args = PopulateArguments(methodInfo, ref rd);
 
-            object retVal;
+            ReturnValue retVal = new();
+            var savedOut = Console.Out;
+            var outWriter = new StringWriter();
+
             try
             {
-                retVal = methodInfo.Invoke(instance, args);
-
-            } catch (Exception e)
-            {
-                retVal = new
-                {
-                    Exception = e.InnerException.ToString()
-                };
-
+                var instance = methodInfo.IsStatic ? null : session.GetInstance(registration.Type);
+                Console.SetOut(outWriter);
+                retVal.R = methodInfo.Invoke(instance, args); 
             }
+            catch (Exception e)
+            {
+                retVal.Exc = e.InnerException?.ToString() ?? e.ToString();
+            }
+            finally
+            {
+                Console.SetOut(savedOut);
+                retVal.Out = outWriter.ToString();
+            }
+            
             return JsonSerializer.SerializeToUtf8Bytes(retVal);
         }
 

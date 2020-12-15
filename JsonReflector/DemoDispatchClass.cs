@@ -33,6 +33,7 @@ namespace JsonReflector
 
         public bool Ping()
         {
+            Console.WriteLine("Pinging!");
             return true;
         }
         public DemoNestedType TargetMethod(int a, string b, List<string> lstring, int[] c, DemoNestedType complex)
