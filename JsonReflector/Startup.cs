@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using JsonReflector;
-namespace ReflectorServer
+namespace JsonReflector
 {
     public class Startup
     {

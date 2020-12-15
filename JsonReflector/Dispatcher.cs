@@ -7,8 +7,17 @@ using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace ReflectorServer
+namespace JsonReflector
 {
+
+    public class ParameterDescrictor
+    {
+        public object Def
+        {
+            get;
+            set;
+        }
+}
     // our lookup table has these
     public class ClassEntry
     {
@@ -16,7 +25,7 @@ namespace ReflectorServer
         public Type Type { get; set; }
         // public object Instance { get; set; }
 
-        private string DescribeType(Type t)
+        private static string DescribeType(Type t)
         {
             if (!t.IsGenericType)
             {
@@ -25,6 +34,29 @@ namespace ReflectorServer
             return t.Name + " " + String.Join(' ', t.GetGenericArguments().Select(a => DescribeType(a)));
         }
 
+        private static List<object> DescribeParameter(ParameterInfo pi)
+        {
+            ParameterDescrictor pd = null;   
+            if (pi.HasDefaultValue)
+            {
+                pd = new ParameterDescrictor
+                {
+                    Def = pi.DefaultValue
+                };
+            }
+
+            var res = new List<object>();
+            res.Add(pi.Name);
+            res.Add(DescribeType(pi.ParameterType));
+            
+            if (pd != null)
+            {
+                res.Add(pd);
+            }
+
+            return res;
+        }
+        
         public List<object> Describe()
         {
             List<object> all = new();
@@ -33,7 +65,7 @@ namespace ReflectorServer
 
             foreach (var method in Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
-                var paramss = method.GetParameters().Select(p => $"{p.Name} {DescribeType(p.ParameterType)}");
+                var paramss = method.GetParameters().Select(p => DescribeParameter(p) );
                 all.Add(new object[] { method.Name, paramss });
 
             }
@@ -61,7 +93,13 @@ namespace ReflectorServer
             }
 
             // minimal di - we support one constructor
-            var ctor = t.GetConstructors()[0];
+            var ctors = t.GetConstructors();
+            if (!ctors.Any())
+            {
+                throw new Exception($"No ctor for {t}");
+            }
+
+            var ctor = ctors[0];
             var cparams = ctor.GetParameters().Select(param => GetInstance(param.ParameterType)).ToArray();
             var invoked = ctor.Invoke(cparams);
             Instances[t] = invoked;

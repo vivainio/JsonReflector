@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JsonReflector\reflectorserver.csproj" />
+    <ProjectReference Include="..\JsonReflector\JsonReflector.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

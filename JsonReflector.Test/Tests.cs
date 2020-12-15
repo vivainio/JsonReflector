@@ -1,5 +1,5 @@
 ﻿using NFluent;
-using ReflectorServer;
+using JsonReflector;
 using TrivialTestRunner;
 
 namespace JsonReflector.Test

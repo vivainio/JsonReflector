@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ReflectorServer
+namespace JsonReflector
 {
     public class AppIntegration : IDispatcherIntegration
     {
@@ -19,7 +19,7 @@ namespace ReflectorServer
             return new Session();
         }
     }
-    public class Program
+    public class JsonReflectorProgram
     {
         public static void Main(string[] args)
         {
