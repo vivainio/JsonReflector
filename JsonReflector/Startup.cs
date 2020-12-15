@@ -60,6 +60,7 @@ namespace JsonReflector
 
                     var d = context.RequestServices.GetRequiredService<Dispatcher>();
                     var cont = await context.Request.Body.GetRawBytesAsync();
+                    
                     var ses = ResolveSession(context);
                     var ret = d.DispatchJson(cont, ses);
                     await context.Response.WriteAsync(ret.AsString());

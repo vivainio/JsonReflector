@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reflectorserver", "JsonReflector\reflectorserver.csproj", "{C78B74A3-4F2F-49C2-9C15-EA85841A1133}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonReflector", "JsonReflector\JsonReflector.csproj", "{C78B74A3-4F2F-49C2-9C15-EA85841A1133}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonReflector.Test", "JsonReflector.Test\JsonReflector.Test.csproj", "{8250913C-D4FE-42CB-9300-474761F3B90F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonReflector.Demo", "JsonReflector.Demo\JsonReflector.Demo.csproj", "{74F5D493-0967-405F-8247-AB50F68C1F43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,5 +46,17 @@ Global
 		{8250913C-D4FE-42CB-9300-474761F3B90F}.Release|x64.Build.0 = Release|Any CPU
 		{8250913C-D4FE-42CB-9300-474761F3B90F}.Release|x86.ActiveCfg = Release|Any CPU
 		{8250913C-D4FE-42CB-9300-474761F3B90F}.Release|x86.Build.0 = Release|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Debug|x64.Build.0 = Debug|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Debug|x86.Build.0 = Debug|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Release|x64.ActiveCfg = Release|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Release|x64.Build.0 = Release|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Release|x86.ActiveCfg = Release|Any CPU
+		{74F5D493-0967-405F-8247-AB50F68C1F43}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
