@@ -2,7 +2,7 @@
 Documentation     Example for JsonReflector
 Library    JsonReflectorLib
 *** Test Cases ***    
-Something Works
+Ping the remote server
     Log    Hello world
-    foo
-    bar
+    ${pong}=    App.DemoDispatchClass Ping
+    Log    ${pong}

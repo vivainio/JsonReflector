@@ -64,12 +64,14 @@ namespace JsonReflector
             all.Add(Name);
             all.Add(Type.FullName);
 
+            var methodList = new List<object>();
             foreach (var method in Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Static))
             {
+                
                 var paramss = method.GetParameters().Select(p => DescribeParameter(p) );
-                all.Add(new object[] { method.Name, paramss });
-
+                methodList.Add(new object[] { method.Name, paramss });
             }
+            all.Add(methodList);
             return all;
 
         }
